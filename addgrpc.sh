@@ -9,11 +9,11 @@ echo -e "\E[44;1;39m           ⇱ XRAY GRPC ⇲           \E[0m"
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 
 domain=$(cat /root/domain)
-tls=$(cat /etc/rare/xray/grpc/vmessgrpc.json | grep port | awk '{print $2}' | sed 's/,//g')
-vl=$(cat /etc/rare/xray/grpc/vlessgrpc.json | grep port | awk '{print $2}' | sed 's/,//g')
+tls=$(cat /etc/xray/grpc/vmessgrpc.json | grep port | awk '{print $2}' | sed 's/,//g')
+vl=$(cat /etc/xray/grpc/vlessgrpc.json | grep port | awk '{print $2}' | sed 's/,//g')
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
 		read -rp "User: " -e user
-		CLIENT_EXISTS=$(grep -w $user /etc/rare/xray/grpc/vmessgrpc.json | wc -l)
+		CLIENT_EXISTS=$(grep -w $user /etc/xray/grpc/vmessgrpc.json | wc -l)
 
 		if [[ ${CLIENT_EXISTS} == '1' ]]; then
 			echo ""
@@ -41,10 +41,10 @@ esac
 #dom=$sub.$domain
 exp=`date -d "$masaaktif days" +"%Y-%m-%d"`
 sed -i '/#vmessgrpc$/a\### '"$user $exp"'\
-},{"id": "'""$uuid""'","alterId": '"0"',"email": "'""$user""'"' /etc/rare/xray/grpc/vmessgrpc.json
+},{"id": "'""$uuid""'","alterId": '"0"',"email": "'""$user""'"' /etc/xray/grpc/vmessgrpc.json
 sed -i '/#vlessgrpc$/a\### '"$user $exp"'\
-},{"id": "'""$uuid""'","email": "'""$user""'"' /etc/rare/xray/grpc/vlessgrpc.json
-cat > /etc/rare/xray/grpc/$user-tls.json << EOF
+},{"id": "'""$uuid""'","email": "'""$user""'"' /etc/xray/grpc/vlessgrpc.json
+cat > /etc/xray/grpc/$user-tls.json << EOF
       {
       "v": "0",
       "ps": "${user}",
@@ -60,7 +60,7 @@ cat > /etc/rare/xray/grpc/$user-tls.json << EOF
 }
 EOF
 vmess_base641=$( base64 -w 0 <<< $vmess_json1)
-vmesslink1="vmess://$(base64 -w 0 /etc/rare/xray/grpc/$user-tls.json)"
+vmesslink1="vmess://$(base64 -w 0 /etc/xray/grpc/$user-tls.json)"
 vlesslink1="vless://${uuid}@${dom}:${vl}?mode=gun&security=tls&encryption=none&type=grpc&serviceName=GunService&sni=$sni#$user"
 systemctl restart xray.service
 systemctl restart vmess-grpc.service
